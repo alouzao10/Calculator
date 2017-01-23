@@ -2,8 +2,8 @@
 //  ViewController.swift
 //  Calculator
 //
-//  Created by Bobby Hamrick on 1/23/17.
-//  Copyright © 2017 Bobby Hamrick. All rights reserved.
+//  Created by Bobby Hamrick & Alex Louzao on 1/23/17.
+//  Copyright © 2017 Bobby Hamrick & Alex Louzao. All rights reserved.
 //
 
 import UIKit
