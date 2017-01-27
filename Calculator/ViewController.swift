@@ -8,11 +8,51 @@
 
 import UIKit
 
+//func add(a,b)
+//return the sum of values a and b
+func add(_ a: Int,_ b: Int) -> Int {
+    return a+b
+}
+
+//func sub(a,b)
+//reutrn the difference of values a and b
+func sub(_ a: Int,_ b: Int) -> Int {
+    return a-b
+}
+
+//func mult(a,b)
+//return the multiplication of a and b
+func mult(_ a: Int,_ b: Int) -> Int {
+    return a*b
+}
+
+//func div(a,b)
+//return the divsion of a and b
+func div(_ a: Int,_ b: Int) -> Int {
+    let ans: Int
+    if b != 0{
+        ans = a/b
+    }else{
+        print("Cannot divide by zero")
+        ans = 0
+    }
+    
+    return ans
+}
+
+
 class ViewController: UIViewController {
     
     
     //delcare the label that displays the numbers
     @IBOutlet var displayLabel: UILabel!
+    
+    //declare each of the operator buttons +,-,/,x
+    @IBOutlet var plusOperator: UIButton!
+    @IBOutlet var minusOperator: UIButton!
+    @IBOutlet var divideOperator: UIButton!
+    @IBOutlet var multiplyOperator: UIButton!
+    
     
 //=======================================================================================
     
@@ -23,7 +63,7 @@ class ViewController: UIViewController {
         var items = [Int]()
         
         //push item onto the stack
-        mutating func push(item: Int){
+        mutating func push(_ item: Int){
             items.append(item)
         }
         
@@ -76,7 +116,7 @@ class ViewController: UIViewController {
         var items = [String]()
         
         //push item onto the stack
-        mutating func push(item: String){
+        mutating func push(_ item: String){
             items.append(item)
         }
         
@@ -131,10 +171,8 @@ class ViewController: UIViewController {
     //text of displayLabel. Later will typecast to Int to perform math
     var newNum: String = ""
     
-    
-//=======================================================================================
-//provide actions for each of the operator button
-
+    //=======================================================================================
+    //provide actions for each of the operator button
     //func displayOne(UIButton)
     //When the 0 button is pushed, display a 0 on the displayLabel
     @IBAction func displayZero(_ sender: UIButton){
@@ -205,90 +243,7 @@ class ViewController: UIViewController {
         createNum(numPressed: num)
     }
     
-//=======================================================================================
-//provide actions for all of the operator buttons
-    
-    //func add(UIButton)
-    //when the addition operator is pushed, add a "+" to the operators stack
-    @IBAction func add(_ sender: UIButton){
-        if newNum != "" {
-            operands.push(item: Int(newNum)!) //push the number onto the operands stack
-            operators.push(item: "+") //push the + operator onto the operator stack
-            newNum = "" //reset the number to nothing in order to take new user
-        }else{
-            newNum = ""
-        }
-    }
-    
-    //func subtract(UIButton)
-    //when the minus operator is pushed, add a "-" to the operators stack
-    @IBAction func minus(_ sender: UIButton){
-        if newNum != "" {
-            operands.push(item: Int(newNum)!) //push the number onto the operands stack
-            operators.push(item: "-") //push the - operator onto the operator stack
-            newNum = "" //reset the number to nothing in order to take new user
-        }else{
-            newNum = ""
-        }
-    }
-    
-    //func times(UIButton)
-    //when the multiplication button is pushed, add a "x" to the operators stack
-    @IBAction func times(_ sender: UIButton){
-        if newNum != "" {
-            operands.push(item: Int(newNum)!) //push the number onto the operands stack
-            operators.push(item: "x") //push the x operator onto the operator stack
-            newNum = "" //reset the number to nothing in order to take new user
-        }else{
-            newNum = ""
-        }
-    }
-    
-    //func divide(UIButton)
-    //when the division button is pushed, add a "/" to the operators stack
-    @IBAction func divide(_ sender: UIButton){
-        if newNum != "" {
-            operands.push(item: Int(newNum)!) //push the number onto the operands stack
-            operators.push(item: "/") //push the / operator onto the operator stack
-            newNum = "" //reset the number to nothing in order to take new user
-        }else{
-            newNum = ""
-        }
-    }
-    
-    //func equal(UIButton)
-    //when the equal button is pushed, call the calculate func
-    //then use that return value from calculate() to set the text of displayLabel
-    @IBAction func equal(_ sender: UIButton){
-        if newNum != "" {
-            operands.push(item: Int(newNum)!) //push the number onto the operands stack
-            let ans = calculate() //call the calculate function to perform the appropriate math operations
-            displayLabel.text = String(describing: ans) //take the return val from calculate and display it
-            newNum = "" //reset the number to nothing in order to take new user input
-        }else{
-            newNum = ""
-        }
-    }
-    
-//=======================================================================================
-//provide actions for all of the AC, C, +/- buttons
-    
-    //func allClear(UIButton)
-    //when the AC button is clicked, all of the data 
-    //in the stacks will be deleted
-    @IBAction func allClear(_ sender: UIButton){
-        operators.clearStack() //wipe out everything in the operator stack
-        operands.clearStack() //wipe out everything in the operand stack
-        displayLabel.text = "0" //set the text back to 0
-        newNum = "" //reset the number to nothing in order to take new user input
-    }
-    
-    @IBAction func clear(_ sender: UIButton){
-        displayLabel.text = "0" //set the text back to 0
-        newNum = "" //reset the number to nothing in order to take new user input
-    }
-
-//=======================================================================================
+    //=======================================================================================
     
     //func createNum(String: num)
     //collects the number(s) that the user pressed, displays the number
@@ -298,41 +253,54 @@ class ViewController: UIViewController {
         displayLabel.text = newNum
     }
     
-    //func calculate() -> Int
-    //this function calculate the equation that is currently being stored in the stack
-    //it returns the answer to this equation in integer form
-    func calculate() -> Int{
-        if !operators.isEmpty() && operands.stackSize() >= 2{
+    
+    
+//=========================================================================================
+//take the operator and call the appropriate function
+    
+    
+    //set a type alias to describe the function being called
+    //two integer parameters and a return value of an integer
+    typealias binop = (Int, Int) -> Int
+    
+    //Declare and initialze ops to discern between what function to use.
+    let ops: [String: binop] = ["+":add,"X":mult,"-":sub,"/":div]
+    
+    //func getOperator(UIButton)
+    //when an operator is clicked, it will be added to the stack. 
+    //If the = button is clicked then it will call the calculate func
+    @IBAction func getOperator(_ sender: UIButton)
+    {
+        let sign = sender.titleLabel!.text! //get the label of the button pushed
+        
+        //check to see if the button pushed was ==
+        if sign == "="{
+            operands.push(Int(newNum)!) //push the number onto the operand stack
+            let num1 = operands.pop()! //pop the number from operand stack
+            let num2 = operands.pop()! //pop the 2nd number from the operand stack
+            let oper = operators.pop()! //pop the operator on the operator stack
             
-            //collect the top two values on the stack
-            let num1: Int = operands.pop()!
-            let num2: Int = operands.pop()!
-            
-            //collect the operator sign
-            let sign: String = operators.pop()!
-            
-            //declare a variable to hold the answer
-            var ans: Int
-            
-            //find which operator the user clicked and 
-            //perform that operation on the two operands
-            switch sign{
-            case "+":
-                ans = num2 + num1
-            case "-":
-                ans = num2 - num1
-            case "x":
-                ans = num2 * num1
-            case "/":
-                ans = num2/num1
-            default:
-                ans = 0
-            }
-            
-            return ans
+            calculate(num1, num2, oper) //calculate the solution
+            newNum = "" //reset the number so user can perform new problem
         }else{
-            return operands.top()!
+            operands.push(Int(newNum)!) //push the number onto the operand stack
+            operators.push(sign) //if a sign was pushed then push it onto the operator stack
+            newNum = "" //reset newNum so user can input new number
         }
+        
+    }
+    
+    //func calculate(a,b,op)
+    //when a user clicks the = button the two numbers on the stack and the
+    //operate will be used to output the correct solution. The operator tell which
+    //function should be called and that function is performed using the two numbers
+    //from the operand stack. The anser is displayed on the label.
+    func calculate(_ a: Int,_ b: Int,_ op: String){
+        let opFunc = ops["\(op)"]
+        
+        let result: Int = opFunc!(a,b)
+        
+        displayLabel.text = String(result)
     }
     
     
